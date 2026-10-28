@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#f4f6f9" />
+  <title>Samsung · Мотивации региона</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <a class="brand" href="#overview" aria-label="Главная Samsung">
+        <span class="brand-mark">S</span>
+        <span class="brand-name">samsung<span>медиа и мотивации</span></span>
+      </a>
+      <div class="nav-label">РАБОЧЕЕ ПРОСТРАНСТВО</div>
+      <nav class="main-nav" aria-label="Основная навигация">
+        <button class="nav-item active" data-page="overview"><span class="nav-icon">◫</span>Обзор региона</button>
+        <button class="nav-item" data-page="campaigns"><span class="nav-icon">✳</span>Мотивации <span class="nav-count">4</span></button>
+        <button class="nav-item" data-page="stores"><span class="nav-icon">⌂</span>Магазины</button>
+        <button class="nav-item" data-page="people"><span class="nav-icon">♙</span>Сотрудники</button>
+        <button class="nav-item" data-page="annual"><span class="nav-icon">▤</span>Годовой результат</button>
+      </nav>
+      <div class="sidebar-spacer"></div>
+      <div class="region-card">
+        <span class="region-overline">ВАШ РЕГИОН</span>
+        <div class="region-person"><span class="avatar avatar-blue">ИВ</span><span><b>Искоркин Владимир</b><small>Региональный директор</small></span></div>
+        <div class="region-meta"><span class="online-dot"></span>16 магазинов в выборке</div>
+      </div>
+      <div class="sidebar-footer"><span class="samsung-wordmark">SAMSUNG</span><span>Информация для сотрудников</span></div>
+    </aside>
+
+    <main class="main-content">
+      <header class="topbar">
+        <div class="breadcrumbs"><span>Samsung</span><span class="crumb-sep">/</span><span id="crumb-current">Обзор региона</span></div>
+        <div class="top-actions"><span class="updated"><i></i><span id="data-date">Данные</span></span><span class="avatar avatar-dark" title="Искоркин Владимир" aria-label="Региональный директор Искоркин Владимир">ИВ</span></div>
+      </header>
+      <section class="page active-page" id="overview-page">
+        <div class="page-intro"><div><div class="eyebrow" id="overview-date"></div><h1>Обзор региона</h1><p class="subtitle">Промежуточные результаты мотиваций Samsung</p></div><span class="quiet-button" id="refresh-button"><span>●</span>Обновлено</span></div>
+        <div class="filter-bar">
+          <div class="filter-caption"><span class="filter-icon">☷</span><b>Фильтры</b><span class="filter-divider"></span></div>
+          <label class="filter-select"><span>Магазин</span><select id="store-filter"><option value="all">Все магазины</option></select><span class="select-arrow">⌄</span></label>
+          <label class="filter-select"><span>Сотрудник</span><select id="employee-filter"><option value="all">Все сотрудники</option></select><span class="select-arrow">⌄</span></label>
+          <button class="reset-filter" id="reset-filter">Сбросить</button>
+          <span class="filter-result" id="filter-result">16 магазинов</span>
+        </div>
+        <div class="metric-grid" id="metrics"></div>
+        <div class="section-heading"><div><h2>Активные мотивации</h2><p>Текущие мотивации региона</p></div><button class="text-button" data-go="campaigns">Все мотивации <span>→</span></button></div>
+        <div class="campaign-grid" id="campaign-cards"></div>
+        <div class="section-heading detail-section-heading"><div><h2>Командные мотивации</h2><p>Выполнение плана магазином и место в группе</p></div><span class="type-label team-label">План магазина · прогноз · место · приз</span></div>
+        <div class="motivation-detail-list" id="team-results"></div>
+        <div class="section-heading detail-section-heading personal-heading"><div><h2>Личные мотивации</h2><p>Продажи сотрудников и начисленные вознаграждения</p></div><span class="type-label personal-label">Продажи в штуках · бонус сотруднику</span></div>
+        <div class="motivation-detail-list personal-detail-list" id="personal-results"></div>
+        <div class="content-grid">
+          <article class="panel results-panel"><div class="panel-heading"><div><h2>Результаты по магазинам</h2><p>Прогноз выполнения планов по мотивациям</p></div><button class="more-button" aria-label="Дополнительно">···</button></div><div class="table-wrap"><table><thead><tr><th>МАГАЗИН</th><th>ТВ + САУНДБАРЫ</th><th>TAB S12</th><th>ДИНАМИКА</th></tr></thead><tbody id="store-results"></tbody></table></div><button class="panel-link" data-go="stores">Открыть все магазины <span>→</span></button></article>
+          <article class="panel leaderboard-panel"><div class="panel-heading"><div><h2>Лидеры Tab S12+ | Ultra</h2><p>По продажам сотрудников</p></div><span class="period-tag">Q4</span></div><div id="leaderboard" class="leader-list"></div><button class="panel-link" data-go="people">Все сотрудники <span>→</span></button></article>
+        </div>
+        <footer class="page-footer"><span>Источник: Мотивации_26_SM.xlsx</span><span>Обновление продаж — еженедельно · Список мотиваций — ежемесячно</span></footer>
+      </section>
+      <section class="page" id="campaigns-page">
+        <div class="page-intro"><div><div class="eyebrow">АКТУАЛЬНЫЕ ПРЕДЛОЖЕНИЯ</div><h1>Мотивации</h1><p class="subtitle">Условия и промежуточные итоги</p></div><span class="status-pill"><i></i>4 мотивации</span></div>
+        <div class="campaign-list" id="campaign-list"></div>
+        <div class="notice-box"><span class="notice-icon">i</span><div><b>Как обновляются данные</b><p>Пришлите обновлённые файлы Excel в этот чат — я подготовлю свежие данные для сайта. Список мотиваций обновляется раз в месяц, продажи — раз в неделю.</p></div></div>
+      </section>
+      <section class="page" id="stores-page">
+        <div class="page-intro"><div><div class="eyebrow">ИСКОРКИН ВЛАДИМИР</div><h1>Магазины</h1><p class="subtitle">Промежуточные результаты 16 магазинов региона</p></div><label class="search-field"><span>⌕</span><input id="store-search" placeholder="Найти магазин" /></label></div>
+        <div class="store-summary" id="store-summary"></div>
+        <article class="panel full-table-panel"><div class="panel-heading"><div><h2>Все магазины</h2><p>Результаты в активных мотивациях</p></div></div><div class="table-wrap"><table><thead><tr><th>МАГАЗИН</th><th>ТВ + САУНДБАРЫ<br><small>факт / план</small></th><th>ПРОГНОЗ</th><th>TAB S12<br><small>факт / план</small></th><th>СТАТУС</th></tr></thead><tbody id="all-stores-table"></tbody></table></div></article>
+      </section>
+      <section class="page" id="people-page">
+        <div class="page-intro"><div><div class="eyebrow">ПРОДАЖИ И РЕЙТИНГ</div><h1>Сотрудники</h1><p class="subtitle">Личный вклад в текущие мотивации</p></div></div>
+        <div class="notice-box compact-notice"><span class="notice-icon">i</span><div><b>Персональный рейтинг Tab S12+ | Ultra</b><p>Показаны сотрудники региона из рейтинга продавцов в исходной книге. Эти данные дополняют командную мотивацию по планшетам.</p></div></div>
+        <article class="panel full-table-panel"><div class="panel-heading"><div><h2>Рейтинг Tab S12+ | Ultra</h2><p>Промежуточные продажи продавцов</p></div><label class="search-field small-search"><span>⌕</span><input id="employee-search" placeholder="Найти сотрудника" /></label></div><div class="table-wrap"><table><thead><tr><th>МЕСТО</th><th>СОТРУДНИК</th><th>МАГАЗИН</th><th>ПРОДАЖИ, ШТ.</th><th>ГРУППА</th></tr></thead><tbody id="all-people-table"></tbody></table></div></article>
+      </section>
+      <section class="page" id="annual-page">
+        <div class="page-intro"><div><div class="eyebrow">НАКОПИТЕЛЬНО ЗА 2026 ГОД</div><h1>Годовой результат</h1><p class="subtitle">Победы магазинов региона в мотивациях</p></div><span class="annual-total" id="annual-total"></span></div>
+        <article class="panel full-table-panel annual-results-panel"><div class="panel-heading"><div><h2>Рейтинг магазинов</h2><p>Источник: сводный рейтинг мотиваций Samsung</p></div></div><div class="table-wrap"><table><thead><tr><th>МАГАЗИН</th><th>ПОБЕДЫ ЗА ГОД</th><th>СТАТУС</th></tr></thead><tbody id="annual-table"></tbody></table></div></article>
+      </section>
+    </main>
+  </div>
+  <script src="site-data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
