@@ -132,10 +132,29 @@ def read_seller_leaderboard(ws):
 
 def read_annual(ws):
     wins = {}
+    result_columns = [7, 10, 13, 16, 19, 22, 25, 28, 31, 34, 37, 56]
+    details = {}
     for row in ws.iter_rows(min_row=6, max_row=22, values_only=True):
         if len(row) > 72 and row[2] in STORES:
             wins[row[2]] = clean_number(row[72], 0)
-    return wins
+            store_details = []
+            for result_column in result_columns:
+                result = row[result_column - 1]
+                if result is None or result == "":
+                    continue
+                start_column = result_column - 2
+                title = ws.cell(2, start_column).value
+                period = ws.cell(3, start_column).value
+                kind = str(ws.cell(4, result_column).value or "").strip().casefold()
+                if "мест" in kind:
+                    result_label = f"Место {result}"
+                elif isinstance(result, (int, float)):
+                    result_label = f"Приз {result:,.0f} ₽".replace(",", " ")
+                else:
+                    result_label = str(result)
+                store_details.append({"title": str(title or "Мотивация"), "period": str(period or "Период не указан"), "result": result_label})
+            details[row[2]] = store_details
+    return wins, details
 
 
 def main():
@@ -169,9 +188,10 @@ def main():
     wb.close()
 
     annual = {name: 0 for name in STORES}
+    annual_details = {name: [] for name in STORES}
     if annual_book.is_file():
         annual_wb = load_workbook(annual_book, read_only=True, data_only=True)
-        annual.update(read_annual(annual_wb["Рейтинг накопительный"]))
+        annual, annual_details = read_annual(annual_wb["Рейтинг накопительный"])
         annual_wb.close()
 
     store_meta = {
@@ -189,15 +209,16 @@ def main():
         stores.append({
             "name": name, "short": store_meta[name], "closed": name == "SMSG_ИРК_СИЛЬВЕР_МОЛЛ",
             "annualWins": annual.get(name, 0),
+            "annualDetails": annual_details.get(name, []),
             "tv": {"sales": tv["fact"], "plan": tv["plan"], "forecast": tv["forecast"]} if tv else {"sales": None, "plan": None, "forecast": None},
             "tab": {"sales": tab["fact"], "plan": tab["plan"], "forecast": tab["forecast"]} if tab else {"sales": None, "plan": None, "forecast": None},
         })
 
     campaigns = [
-        {"id": "tv", "type": "team", "title": "ТВ + саундбары", "sub": "Продажи телевизоров и саундбаров Samsung", "dates": tv_dates or "Период уточняется", "period": short_period(tv_dates, "ТВ"), "conditions": "Командная мотивация. Продажи и планы считаются в рублях по группе магазина. В срезе показаны прогноз выполнения, текущее место и приз; итоговое место определяется по завершении периода.", "style": ""},
-        {"id": "tab", "type": "team", "title": "Планшеты Tab S12", "sub": "Продажи планшетов Samsung Tab S12", "dates": tab_dates or "Период уточняется", "period": short_period(tab_dates, "Tab S12"), "conditions": "Командная мотивация. Продажи и планы считаются в штуках по группе магазина. В исходной вкладке указаны план, факт и прогноз; место и сумма приза в этом срезе не указаны.", "style": "tab"},
-        {"id": "trade", "type": "personal", "title": "Trade-in Watch", "sub": "Личное вознаграждение за продажу часов", "dates": f"{trade_quarter} {year}", "period": f"{trade_quarter} · Trade-in", "conditions": "Личная мотивация. За каждую продажу начисляется ставка по модели часов; ниже показаны ставки, расчётная сумма по продажам и начисление из исходной книги.", "rates": trade_rates, "style": "trade-card"},
-        {"id": "uBear", "type": "personal", "title": "БЗУ uBear", "sub": "Личный бонус за продажу зарядных устройств", "dates": f"{ubear_quarter} {year}", "period": f"{ubear_quarter} · uBear", "conditions": "Личная мотивация. За каждую продажу зарядного устройства uBear начисляется ставка по артикулу; ниже показаны тарифы и продажи сотрудников.", "rates": ubear_rates, "style": "ubear-card"},
+        {"id": "tv", "type": "team", "title": "ТВ + саундбары", "sub": "Продажи телевизоров и саундбаров Samsung", "dates": tv_dates or "Период уточняется", "period": short_period(tv_dates, "ТВ"), "conditions": "Период: 05.10–31.12.2026. Участвуют магазины и региональные директора; учитываются все каналы продаж. Каждый магазин относится к одной из 12 групп и получает призовое место только при выполнении плана выше 100%. Призовой фонд распределяет внутри магазина управляющий. План региона равен сумме планов магазинов. Региональные директора соревнуются по перевыполнению плана; призы начисляются в премию за декабрь.", "style": ""},
+        {"id": "tab", "type": "team", "title": "Планшеты Tab S12", "sub": "Продажи планшетов Samsung Tab S12", "dates": tab_dates or "Период уточняется", "period": short_period(tab_dates, "Tab S12"), "conditions": "Период: 19.10–30.11.2026. В зачёт идут Galaxy Tab S12+ и Tab S12 Ultra всех конфигураций, проданные офлайн или с самовывозом. Это три независимых зачёта: магазин получает Galaxy Buds4 при выполнении собственного плана на 100%; продавцы соревнуются по личным продажам внутри группы магазинов, а Galaxy Buds4 Pro получают первые места при достижении порога группы; региональный директор получает Galaxy Buds4 Pro, если продажи магазинов региона не ниже суммы их планов. Выполнение цели сети на выдачу призов не влияет. Призы магазина и региона распределяются по правилам мотивации.", "style": "tab"},
+        {"id": "trade", "type": "personal", "title": "Trade-in Watch", "sub": "Личное вознаграждение за продажу часов", "dates": f"02.10–31.10.{year}", "period": f"02.10–31.10", "conditions": "Период: 02.10–31.10.2026. За каждую Galaxy Watch9 или Galaxy Watch Ultra 2, проданную в trade-in, продавцу начисляется бонус по модели: 800 ₽ за Watch Ultra 2 и 500 ₽ за Watch9. Учитываются продажи офлайн и заказы с самовывозом. Обязательное условие выплат — выполнение сетью плана 230 часов за период; при невыполнении плана бонус не выплачивается. Выплата начисляется в премию.", "rates": trade_rates, "style": "trade-card"},
+        {"id": "uBear", "type": "personal", "title": "БЗУ uBear", "sub": "Личный бонус за продажу зарядных устройств", "dates": f"01.10–30.11.{year}", "period": "01.10–30.11", "conditions": "Период: 01.10–30.11.2026. Продавец получает бонус за каждое беспроводное зарядное устройство uBear из списка — без плана и дополнительных условий. Учитываются продажи офлайн и заказы с самовывозом. Размер бонуса зависит от модели; ставки указаны ниже. Выплата начисляется в премию.", "rates": ubear_rates, "style": "ubear-card"},
     ]
     payload = {
         "updatedAt": updated.isoformat() if isinstance(updated, (datetime, date)) else str(updated or ""),
